@@ -1,0 +1,71 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Page background */
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: #222831;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+}
+
+/* Center SVG */
+.container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* SVG sizing */
+svg {
+  width: 90vw;
+  max-width: 500px;
+  height: auto;
+  display: block;
+}
+
+/* Heart sections */
+.section {
+  fill: #ffffff;
+  cursor: pointer;
+  transition: fill 0.25s ease;
+}
+
+/* On click */
+.section.active {
+  fill: #e63946;
+}
+
+.section {
+  fill: #ffffff;
+  cursor: pointer;
+  transition: fill 0.25s ease;
+}
+
+/* لون الباث لما يتفعل */
+.section.active {
+  fill: #e63946;
+}
+
+/* شكل التيكست */
+.section-text {
+  fill: #000000;
+  font-size: 14px;
+  font-weight: bold;
+  pointer-events: none;
+  user-select: none;
+  transition: fill 0.25s ease;
+}
+
+/* لما الباث يبقى active → التيكست أبيض */
+.section.active + .section-text {
+  fill: #ffffff;
+}
+
