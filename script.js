@@ -235,7 +235,6 @@ fetch("./heart.svg")
       "stat-remaining"
     ).textContent = `${remaining} سورة`;
 
-    // 👈 هنا فقط يتم تحديث البروجريس بار
     document.getElementById(
       "stat-progress-bar"
     ).style.width = `${ayatProgress}%`;
@@ -489,24 +488,42 @@ fetch("./heart.svg")
       clonedSVG.setAttribute("width", scaledWidth);
       clonedSVG.setAttribute("height", scaledHeight);
 
+      const styles = getComputedStyle(document.documentElement);
+
+      const surahColor = styles.getPropertyValue("--surah-color").trim();
+      const surahActiveColor = styles.getPropertyValue("--surah-active-color").trim();
+      const textColor = styles.getPropertyValue("--text-color").trim();
+      const textActiveColor = styles.getPropertyValue("--text-active-color").trim();
+
       const styleElement = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "style"
       );
+
       styleElement.textContent = `
-        .section { fill: #ffffff; }
-        .section.active { fill: #e63946; }
-        .section-text { fill: #000000; font-size: 14px; font-weight: bold; }
-        .section.active + .section-text { fill: #ffffff; }
+        .section { fill: ${surahColor}; }
+        .section.active { fill: ${surahActiveColor}; }
+        .section-text {
+          fill: ${textColor};
+          font-size: 14px;
+          font-weight: bold;
+        }
+        .section.active + .section-text {
+          fill: ${textActiveColor};
+        }
       `;
+
       clonedSVG.insertBefore(styleElement, clonedSVG.firstChild);
+
 
       const canvas = document.createElement("canvas");
       canvas.width = width;
       canvas.height = height;
       const ctx = canvas.getContext("2d");
 
-      ctx.fillStyle = "#222831";
+      const bgColor = getComputedStyle(document.documentElement).getPropertyValue("--bg-color").trim();
+
+      ctx.fillStyle = bgColor || "#222831";
       ctx.fillRect(0, 0, width, height);
 
       const serializer = new XMLSerializer();
