@@ -191,59 +191,59 @@ fetch("./heart.svg")
     });
 
     function updateStats() {
-    const total = groups.length;
-    let completed = 0;
+      const total = groups.length;
+      let completed = 0;
 
-    groups.forEach((g) => {
-      const path = g.querySelector(".section");
-      if (path && path.classList.contains("active")) {
-        completed++;
-      }
-    });
+      groups.forEach((g) => {
+        const path = g.querySelector(".section");
+        if (path && path.classList.contains("active")) {
+          completed++;
+        }
+      });
 
-    const remaining = total - completed;
+      const remaining = total - completed;
     const completedPercentage =
       total === 0 ? 0 : Math.round((completed / total) * 100);
     const remainingPercentage = 100 - completedPercentage;
 
-    let completedAyat = 0;
+      let completedAyat = 0;
 
-    groups.forEach((g) => {
-      const path = g.querySelector(".section");
-      const textElement = g.querySelector(".section-text");
-      if (!path || !textElement) return;
+      groups.forEach((g) => {
+        const path = g.querySelector(".section");
+        const textElement = g.querySelector(".section-text");
+        if (!path || !textElement) return;
 
-      let surahName = textElement.textContent
-        .replace("سورة", "")
-        .trim();
+        let surahName = textElement.textContent
+          .replace("سورة", "")
+          .trim();
 
-      if (
-        path.classList.contains("active") &&
-        SURAH_AYAT_COUNT[surahName]
-      ) {
-        completedAyat += SURAH_AYAT_COUNT[surahName];
-      }
-    });
+        if (
+          path.classList.contains("active") &&
+          SURAH_AYAT_COUNT[surahName]
+        ) {
+          completedAyat += SURAH_AYAT_COUNT[surahName];
+        }
+      });
 
-    const ayatProgress = Math.round((completedAyat / 6236) * 100);
+      const ayatProgress = Math.round((completedAyat / 6236) * 100);
 
-    document.getElementById(
-      "stat-completed"
-    ).textContent = `${completed} سورة`;
+      document.getElementById(
+        "stat-completed"
+      ).textContent = `${completed} سورة`;
 
-    document.getElementById(
-      "stat-remaining"
-    ).textContent = `${remaining} سورة`;
+      document.getElementById(
+        "stat-remaining"
+      ).textContent = `${remaining} سورة`;
 
-    document.getElementById(
-      "stat-progress-bar"
-    ).style.width = `${ayatProgress}%`;
+      document.getElementById(
+        "stat-progress-bar"
+      ).style.width = `${ayatProgress}%`;
 
-    document.getElementById(
-      "stat-percentage"
-    ).textContent =
-      `تم حفظ ${ayatProgress}% من القرآن الكريم والمتبقي ${100 - ayatProgress}%`;
-  }
+      document.getElementById(
+        "stat-percentage"
+      ).textContent =
+        `تم حفظ ${ayatProgress}% من القرآن الكريم والمتبقي ${100 - ayatProgress}%`;
+    }
 
     let scale = 1;
     let pointX = 0;
