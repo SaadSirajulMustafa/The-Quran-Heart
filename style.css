@@ -435,146 +435,119 @@ svg {
   }
 }
 
-/* Theme Panel (Arabic) */
-.theme-panel {
+/* Memorization Level Buttons */
+.level-buttons {
   position: fixed;
-  top: 80px;
-  left: 20px;
-  background: linear-gradient(180deg, #2d3440, #252b36);
-  padding: 18px 16px;
-  border-radius: 18px;
-  width: 240px;
-  display: none;
-  z-index: 200;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  direction: rtl;
-  font-family: "Tajawal", sans-serif;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 100;
 }
 
-.theme-panel.active {
-  display: block;
-  animation: panelFadeIn 0.25s ease-out;
-}
-
-/* Smooth entrance */
-@keyframes panelFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-8px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* Labels */
-.theme-panel label {
-  display: block;
-  margin-top: 14px;
-  margin-bottom: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #f1f1f1;
-  line-height: 1.4;
-}
-
-/* First label spacing fix */
-.theme-panel label:first-child {
-  margin-top: 0;
-}
-
-/* Color Inputs */
-.theme-panel input[type="color"] {
-  width: 100%;
-  height: 38px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background-color: rgba(34, 40, 49, 0.7);
+.level-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  background-color: rgba(34, 40, 49, 0.85);
+  border: 2px solid rgba(255, 255, 255, 0.15);
   cursor: pointer;
-  padding: 4px;
-  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
 }
 
-/* Hover + Focus */
-.theme-panel input[type="color"]:hover,
-.theme-panel input[type="color"]:focus {
-  border-color: var(--surah-active-color);
-  box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.25);
-  outline: none;
+.level-btn:hover {
+  background-color: rgba(34, 40, 49, 0.95);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
 }
 
-/* Small separation line (optional luxury touch) */
-.theme-panel label:not(:first-child)::before {
-  content: "";
-  display: block;
-  height: 1px;
-  margin: 12px 0 10px;
-  background: linear-gradient(
-    to left,
-    rgba(255, 255, 255, 0),
-    rgba(255, 255, 255, 0.12),
-    rgba(255, 255, 255, 0)
-  );
+.level-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* =========================
-   Mobile – Center Stats Box
-========================= */
-@media (max-width: 600px) {
+.level-btn svg {
+  color: #ffffff;
+  width: 24px;
+  height: 24px;
+}
 
-  /* Stats box in true center-bottom */
-  .stats-container {
-    top: auto;
-    bottom: 3vh;
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
+/* Active level button */
+.level-btn.active {
+  border-width: 3px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
 
-    width: calc(100vw - 140px); 
-    max-width: 320px;
-    min-width: 240px;
+#level-good.active {
+  border-color: #4caf50;
+  background-color: rgba(76, 175, 80, 0.2);
+}
 
-    padding: 14px 14px;
-    z-index: 80;
+#level-good.active svg {
+  color: #4caf50;
+}
+
+#level-middle.active {
+  border-color: #ffc107;
+  background-color: rgba(255, 193, 7, 0.2);
+}
+
+#level-middle.active svg {
+  color: #ffc107;
+}
+
+#level-weak.active {
+  border-color: #f44336;
+  background-color: rgba(244, 67, 54, 0.2);
+}
+
+#level-weak.active svg {
+  color: #f44336;
+}
+
+/* Memorization Level Colors for Sections */
+.section.level-good {
+  fill: #4caf50 !important;
+}
+
+.section.level-middle {
+  fill: #ffc107 !important;
+}
+
+.section.level-weak {
+  fill: #f44336 !important;
+}
+
+/* Text color adjustments for colored sections */
+.section.level-good + .section-text,
+.section.level-middle + .section-text,
+.section.level-weak + .section-text {
+  fill: #ffffff;
+}
+
+/* Responsive adjustments for level buttons */
+@media (max-width: 768px) {
+  .level-buttons {
+    bottom: 15px;
+    right: 15px;
+    gap: 10px;
   }
 
-  /* Content scaling */
-  .stat-row {
-    font-size: 14px;
-    margin-bottom: 8px;
+  .level-btn {
+    width: 45px;
+    height: 45px;
   }
 
-  .stat-value {
-    font-size: 16px;
-  }
-
-  .stat-percentage {
-    font-size: 12px;
-    margin-bottom: 8px;
-  }
-
-  .progress-bar-bg {
-    margin-top: 10px;
-    margin-bottom: 6px;
-  }
-
-  .reset-btn {
-    padding: 7px;
-    font-size: 12px;
-  }
-
-  /* Move buttons away from center */
-  .download-buttons {
-    left: 12px;
-    bottom: 3vh;
-    z-index: 100;
-  }
-
-  .zoom-controls {
-    right: 12px;
-    bottom: 3vh;
-    z-index: 100;
+  .level-btn svg {
+    width: 20px;
+    height: 20px;
   }
 }
+

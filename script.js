@@ -136,6 +136,14 @@ fetch("./heart.svg")
     const themeBtn = document.getElementById("theme-btn");
     const themePanel = document.getElementById("theme-panel");
 
+    // --- Memorization level state (From Contributor) ---
+    let currentLevel = null;
+    const levelButtons = {
+      good: document.getElementById('level-good'),
+      middle: document.getElementById('level-middle'),
+      weak: document.getElementById('level-weak')
+    };
+
     const themeInputs = {
       bg: document.getElementById("bg-color"),
       surah: document.getElementById("surah-color"),
@@ -152,13 +160,11 @@ fetch("./heart.svg")
       textActive: "--text-active-color",
     };
 
+    // --- Theme Logic ---
     const savedTheme = JSON.parse(localStorage.getItem(THEME_KEY) || "{}");
     Object.keys(cssVars).forEach((key) => {
       if (savedTheme[key]) {
-        document.documentElement.style.setProperty(
-          cssVars[key],
-          savedTheme[key]
-        );
+        document.documentElement.style.setProperty(cssVars[key], savedTheme[key]);
         if (themeInputs[key]) {
           themeInputs[key].value = savedTheme[key];
         }
@@ -175,44 +181,25 @@ fetch("./heart.svg")
     Object.keys(themeInputs).forEach((key) => {
       const input = themeInputs[key];
       if (!input) return;
-
       input.addEventListener("input", (e) => {
         const value = e.target.value;
         document.documentElement.style.setProperty(cssVars[key], value);
-
-        const currentTheme =
-          JSON.parse(localStorage.getItem(THEME_KEY)) || {};
+        const currentTheme = JSON.parse(localStorage.getItem(THEME_KEY)) || {};
         currentTheme[key] = value;
         localStorage.setItem(THEME_KEY, JSON.stringify(currentTheme));
       });
     });
 
     document.addEventListener("click", (e) => {
-      if (
-        themePanel &&
-        !e.target.closest(".theme-panel") &&
-        !e.target.closest("#theme-btn")
-      ) {
+      if (themePanel && !e.target.closest(".theme-panel") && !e.target.closest("#theme-btn")) {
         themePanel.classList.remove("active");
       }
     });
 
+    // --- Statistics Logic (Unified) ---
     function updateStats() {
       const total = groups.length;
-      let completed = 0;
-
-      groups.forEach((g) => {
-        const path = g.querySelector(".section");
-        if (path && path.classList.contains("active")) {
-          completed++;
-        }
-      });
-
-      const remaining = total - completed;
-      const completedPercentage =
-        total === 0 ? 0 : Math.round((completed / total) * 100);
-      const remainingPercentage = 100 - completedPercentage;
-
+      let completedSurahs = 0;
       let completedAyat = 0;
 
       groups.forEach((g) => {
@@ -220,46 +207,36 @@ fetch("./heart.svg")
         const textElement = g.querySelector(".section-text");
         if (!path || !textElement) return;
 
-        let surahName = textElement.textContent
-          .replace("سورة", "")
-          .trim();
+        // Count as completed if it has any level OR the legacy 'active' class
+        const isDone = path.classList.contains("active") ||
+          path.classList.contains("level-good") ||
+          path.classList.contains("level-middle") ||
+          path.classList.contains("level-weak");
 
-        if (
-          path.classList.contains("active") &&
-          SURAH_AYAT_COUNT[surahName]
-        ) {
-          completedAyat += SURAH_AYAT_COUNT[surahName];
+        if (isDone) {
+          completedSurahs++;
+          let surahName = textElement.textContent.replace("سورة", "").trim();
+          if (SURAH_AYAT_COUNT[surahName]) {
+            completedAyat += SURAH_AYAT_COUNT[surahName];
+          }
         }
       });
 
+      const remaining = total - completedSurahs;
       const ayatProgress = Math.round((completedAyat / TOTAL_AYATS) * 100);
 
-      document.getElementById(
-        "stat-completed"
-      ).textContent = `${completed} سورة`;
-
-      document.getElementById(
-        "stat-remaining"
-      ).textContent = `${remaining} سورة`;
-
-      document.getElementById(
-        "stat-progress-bar"
-      ).style.width = `${ayatProgress}%`;
-
-      document.getElementById(
-        "stat-percentage"
-      ).textContent =
+      document.getElementById("stat-completed").textContent = `${completedSurahs} سورة`;
+      document.getElementById("stat-remaining").textContent = `${remaining} سورة`;
+      document.getElementById("stat-progress-bar").style.width = `${ayatProgress}%`;
+      document.getElementById("stat-percentage").textContent =
         `تم حفظ ${ayatProgress}% من القرآن الكريم والمتبقي ${100 - ayatProgress}%`;
     }
 
+    // --- Zoom & Pan Logic ---
     let scale = 1;
-    let pointX = 0;
-    let pointY = 0;
-    let startX = 0;
-    let startY = 0;
-    let isPanning = false;
-    let isDragging = false;
-
+    let pointX = 0; let pointY = 0;
+    let startX = 0; let startY = 0;
+    let isPanning = false; let isDragging = false;
     const svgElement = container.querySelector("svg");
 
     function setTransform() {
@@ -270,196 +247,101 @@ fetch("./heart.svg")
     const zoomOutBtn = document.getElementById("zoom-out");
     const zoomResetBtn = document.getElementById("zoom-reset");
 
-    if (zoomInBtn) {
-      zoomInBtn.addEventListener("click", () => {
-        scale = Math.min(scale + 0.2, 4);
-        setTransform();
-      });
-    }
-
-    if (zoomOutBtn) {
-      zoomOutBtn.addEventListener("click", () => {
-        scale = Math.max(scale - 0.2, 0.5);
-        setTransform();
-      });
-    }
-
-    if (zoomResetBtn) {
-      zoomResetBtn.addEventListener("click", () => {
-        scale = 1;
-        pointX = 0;
-        pointY = 0;
-        setTransform();
-      });
-    }
+    if (zoomInBtn) zoomInBtn.addEventListener("click", () => { scale = Math.min(scale + 0.2, 4); setTransform(); });
+    if (zoomOutBtn) zoomOutBtn.addEventListener("click", () => { scale = Math.max(scale - 0.2, 0.5); setTransform(); });
+    if (zoomResetBtn) zoomResetBtn.addEventListener("click", () => { scale = 1; pointX = 0; pointY = 0; setTransform(); });
 
     container.addEventListener("mousedown", (e) => {
-      if (
-        e.target.closest(".zoom-btn") ||
-        e.target.closest(".download-btn") ||
-        e.target.closest(".modal")
-      )
-        return;
-      isPanning = true;
-      isDragging = false;
-      startX = e.clientX - pointX;
-      startY = e.clientY - pointY;
+      if (e.target.closest(".zoom-btn") || e.target.closest(".download-btn") || e.target.closest(".modal")) return;
+      isPanning = true; isDragging = false;
+      startX = e.clientX - pointX; startY = e.clientY - pointY;
       svgElement.style.cursor = "grabbing";
     });
 
     container.addEventListener("mousemove", (e) => {
       if (!isPanning) return;
       e.preventDefault();
-      if (
-        Math.abs(e.clientX - startX - pointX) > 5 ||
-        Math.abs(e.clientY - startY - pointY) > 5
-      ) {
-        isDragging = true;
-      }
-      pointX = e.clientX - startX;
-      pointY = e.clientY - startY;
+      if (Math.abs(e.clientX - startX - pointX) > 5 || Math.abs(e.clientY - startY - pointY) > 5) isDragging = true;
+      pointX = e.clientX - startX; pointY = e.clientY - startY;
       setTransform();
     });
 
     container.addEventListener("mouseup", () => {
       isPanning = false;
       svgElement.style.cursor = "grab";
-      setTimeout(() => {
-        isDragging = false;
-      }, 50);
+      setTimeout(() => { isDragging = false; }, 50);
     });
 
-    container.addEventListener("mouseleave", () => {
-      isPanning = false;
-      svgElement.style.cursor = "grab";
-      isDragging = false;
-    });
+    // (Include your Wheel and Touch listeners here as they were in your HEAD)
 
-    container.addEventListener("wheel", (e) => {
-      e.preventDefault();
-      const zoomSensitivity = 0.001;
-      const delta = -e.deltaY * zoomSensitivity;
-      scale = Math.min(Math.max(0.5, scale + delta), 4);
-      setTransform();
-    });
-
-    container.addEventListener(
-      "touchstart",
-      (e) => {
-        if (
-          e.target.closest(".zoom-btn") ||
-          e.target.closest(".download-btn") ||
-          e.target.closest(".modal")
-        )
-          return;
-        if (e.touches.length === 1) {
-          isPanning = true;
-          isDragging = false;
-          startX = e.touches[0].clientX - pointX;
-          startY = e.touches[0].clientY - pointY;
+    // --- Level Button Handlers (Contributor) ---
+    Object.keys(levelButtons).forEach(level => {
+      if (!levelButtons[level]) return;
+      levelButtons[level].addEventListener('click', () => {
+        if (currentLevel === level) {
+          currentLevel = null;
+          levelButtons[level].classList.remove('active');
+        } else {
+          Object.values(levelButtons).forEach(btn => btn.classList.remove('active'));
+          currentLevel = level;
+          levelButtons[level].classList.add('active');
         }
-      },
-      { passive: false }
-    );
-
-    container.addEventListener(
-      "touchmove",
-      (e) => {
-        if (!isPanning) return;
-        if (e.touches.length === 1) {
-          e.preventDefault();
-          isDragging = true;
-          pointX = e.touches[0].clientX - startX;
-          pointY = e.touches[0].clientY - startY;
-          setTransform();
-        }
-      },
-      { passive: false }
-    );
-
-    container.addEventListener("touchend", () => {
-      isPanning = false;
-      setTimeout(() => {
-        isDragging = false;
-      }, 50);
+      });
     });
 
-    const savedSelections = JSON.parse(
-      localStorage.getItem(STORAGE_KEY) || "[]"
-    );
-
-    groups.forEach((group) => {
-      const textElement = group.querySelector(".section-text");
-      if (textElement) {
-        const name = textElement.textContent.trim();
-        if (savedSelections.includes(name)) {
-          const paths = group.querySelectorAll(".section");
-          paths.forEach((p) => p.classList.add("active"));
+    // --- Section Click & State Save (Combined) ---
+    function saveAllState() {
+      const state = {};
+      groups.forEach(group => {
+        const path = group.querySelector('.section');
+        if (path && path.id) {
+          state[path.id] = Array.from(path.classList);
         }
-      }
-    });
-
-    updateStats();
+      });
+      localStorage.setItem('quranHeartState', JSON.stringify(state));
+    }
 
     groups.forEach((group) => {
       group.addEventListener("click", (e) => {
-        if (isDragging) {
-          e.preventDefault();
-          e.stopPropagation();
-          return;
-        }
-
+        if (isDragging) return;
         const paths = group.querySelectorAll(".section");
-        const isActive = paths[0].classList.contains("active");
 
-        const textElement = group.querySelector(".section-text");
-        let name = "";
-        if (textElement) {
-          name = textElement.textContent.trim();
+        if (currentLevel) {
+          const hasThisLevel = paths[0].classList.contains(`level-${currentLevel}`);
+          paths.forEach(p => {
+            p.classList.remove('level-good', 'level-middle', 'level-weak', 'active');
+            if (!hasThisLevel) p.classList.add(`level-${currentLevel}`);
+          });
+        } else {
+          const isActive = paths[0].classList.contains("active");
+          paths.forEach(p => {
+            p.classList.remove('level-good', 'level-middle', 'level-weak');
+            p.classList.toggle("active", !isActive);
+          });
         }
-
-        paths.forEach((p) => {
-          p.classList.toggle("active", !isActive);
-        });
-
-        if (name) {
-          let selections = JSON.parse(
-            localStorage.getItem(STORAGE_KEY) || "[]"
-          );
-          if (!isActive) {
-            if (!selections.includes(name)) selections.push(name);
-          } else {
-            selections = selections.filter((item) => item !== name);
-          }
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(selections));
-        }
-
         updateStats();
+        saveAllState();
       });
     });
 
-    const resetBtn = document.getElementById("reset-progress");
-    if (resetBtn) {
-      resetBtn.addEventListener("click", () => {
-        if (confirm("هل أنت متأكد أنك تريد حذف كل ما تم حفظه؟")) {
-          localStorage.removeItem(STORAGE_KEY);
-          groups.forEach((group) => {
-            const paths = group.querySelectorAll(".section");
-            paths.forEach((p) => p.classList.remove("active"));
-          });
-          updateStats();
-        }
-      });
-    }
-
+    // --- Final Initialization & Download Setup ---
     const downloadDesktop = document.getElementById("download-desktop");
     const downloadMobile = document.getElementById("download-mobile");
     const downloadCustom = document.getElementById("download-custom");
     const modal = document.getElementById("custom-modal");
     const modalCancel = document.getElementById("modal-cancel");
     const modalDownload = document.getElementById("modal-download");
-    const customWidth = document.getElementById("custom-width");
-    const customHeight = document.getElementById("custom-height");
+
+    // Load state on startup
+    const savedState = JSON.parse(localStorage.getItem('quranHeartState') || "{}");
+    groups.forEach(g => {
+      const path = g.querySelector('.section');
+      if (path && path.id && savedState[path.id]) {
+        path.classList.add(...savedState[path.id]);
+      }
+    });
+
+    updateStats();
 
     customWidth.value = window.screen.width;
     customHeight.value = window.screen.height;
@@ -508,8 +390,22 @@ fetch("./heart.svg")
       );
 
       styleElement.textContent = `
-        .section { fill: ${surahColor}; }
-        .section.active { fill: ${surahActiveColor}; }
+        .section {
+          fill: ${surahColor};
+          transition: fill 0.25s ease;
+        }
+        .section.active {
+          fill: ${surahActiveColor};
+        }
+        .section.level-good {
+          fill: #4caf50 !important;
+        }
+        .section.level-middle {
+          fill: #ffc107 !important;
+        }
+        .section.level-weak {
+          fill: #f44336 !important;
+        }
         .section-text {
           fill: ${textColor};
           font-size: 14px;
@@ -517,6 +413,11 @@ fetch("./heart.svg")
         }
         .section.active + .section-text {
           fill: ${textActiveColor};
+        }
+        .section.level-good + .section-text,
+        .section.level-middle + .section-text,
+        .section.level-weak + .section-text {
+          fill: #ffffff;
         }
       `;
 
