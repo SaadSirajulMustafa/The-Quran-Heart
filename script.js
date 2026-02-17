@@ -115,8 +115,15 @@ const SURAH_AYAT_COUNT = {
   "الناس": 6
 };
 
+// Calculate total ayats dynamically 
+const TOTAL_AYATS = Object.values(SURAH_AYAT_COUNT).reduce((a, b) => a + b, 0);
+
 fetch("./heart.svg")
   .then((res) => res.text())
+  .then((res) => {
+    if (!res.ok) throw new Error("Failed to load SVG");
+    return res.text();
+  })
   .then((svg) => {
     const container = document.getElementById("svg-container");
     container.innerHTML = svg;
@@ -202,9 +209,9 @@ fetch("./heart.svg")
       });
 
       const remaining = total - completed;
-    const completedPercentage =
-      total === 0 ? 0 : Math.round((completed / total) * 100);
-    const remainingPercentage = 100 - completedPercentage;
+      const completedPercentage =
+        total === 0 ? 0 : Math.round((completed / total) * 100);
+      const remainingPercentage = 100 - completedPercentage;
 
       let completedAyat = 0;
 
@@ -225,7 +232,7 @@ fetch("./heart.svg")
         }
       });
 
-      const ayatProgress = Math.round((completedAyat / 6236) * 100);
+      const ayatProgress = Math.round((completedAyat / TOTAL_AYATS) * 100);
 
       document.getElementById(
         "stat-completed"
@@ -590,4 +597,7 @@ fetch("./heart.svg")
         modal.classList.remove("active");
       }
     });
+  })
+  .catch((error) => {
+    console.error("Error initializing Quran Heart:", error);
   });
