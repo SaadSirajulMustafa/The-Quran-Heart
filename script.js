@@ -115,11 +115,12 @@ const SURAH_AYAT_COUNT = {
   "الناس": 6
 };
 
-// Calculate total ayats dynamically 
-const TOTAL_AYATS = Object.values(SURAH_AYAT_COUNT).reduce((a, b) => a + b, 0);
+// Calculate total ayats dynamically
+// Object.values() extracts the counts into an array: [7, 286, 200, ...]
+// .reduce() sums them up starting from 0
+const TOTAL_AYATS = Object.values(SURAH_AYAT_COUNT).reduce((total, count) => total + count, 0);
 
 fetch("./heart.svg")
-  .then((res) => res.text())
   .then((res) => {
     if (!res.ok) throw new Error("Failed to load SVG");
     return res.text();
@@ -128,15 +129,14 @@ fetch("./heart.svg")
     const container = document.getElementById("svg-container");
     container.innerHTML = svg;
 
+    // --- DOM Elements & Constants ---
     const groups = container.querySelectorAll(".section-group");
-    const STORAGE_KEY = "quran-heart-active-sections";
-
     const THEME_KEY = "quran-heart-theme";
 
     const themeBtn = document.getElementById("theme-btn");
     const themePanel = document.getElementById("theme-panel");
 
-    // --- Memorization level state (From Contributor) ---
+    // --- Memorization Level State ---
     let currentLevel = null;
     const levelButtons = {
       good: document.getElementById('level-good'),
@@ -160,7 +160,9 @@ fetch("./heart.svg")
       textActive: "--text-active-color",
     };
 
-    // --- Theme Logic ---
+    // ==========================================
+    //              THEME LOGIC
+    // ==========================================
     const savedTheme = JSON.parse(localStorage.getItem(THEME_KEY) || "{}");
     Object.keys(cssVars).forEach((key) => {
       if (savedTheme[key]) {
@@ -196,7 +198,9 @@ fetch("./heart.svg")
       }
     });
 
-    // --- Statistics Logic (Unified) ---
+    // ==========================================
+    //            STATISTICS LOGIC
+    // ==========================================
     function updateStats() {
       const total = groups.length;
       let completedSurahs = 0;
@@ -232,7 +236,9 @@ fetch("./heart.svg")
         `تم حفظ ${ayatProgress}% من القرآن الكريم والمتبقي ${100 - ayatProgress}%`;
     }
 
-    // --- Zoom & Pan Logic ---
+    // ==========================================
+    //           ZOOM & PAN LOGIC
+    // ==========================================
     let scale = 1;
     let pointX = 0; let pointY = 0;
     let startX = 0; let startY = 0;
@@ -272,9 +278,57 @@ fetch("./heart.svg")
       setTimeout(() => { isDragging = false; }, 50);
     });
 
-    // (Include your Wheel and Touch listeners here as they were in your HEAD)
+    // --- Mouse Wheel Zoom Handler ---
+    container.addEventListener("wheel", (e) => {
+      e.preventDefault();
+      const zoomSensitivity = 0.001;
+      const delta = -e.deltaY * zoomSensitivity;
+      const newScale = Math.min(Math.max(0.5, scale + delta), 4);
 
-    // --- Level Button Handlers (Contributor) ---
+      // Optional: Zoom towards mouse position
+      scale = newScale;
+      setTransform();
+    }, { passive: false });
+
+    // --- Touch Gestures (Mobile) Handler ---
+    container.addEventListener("touchstart", (e) => {
+      // Don't pan if we're clicking buttons or modals
+      if (
+        e.target.closest(".zoom-btn") ||
+        e.target.closest(".download-btn") ||
+        e.target.closest(".modal") ||
+        e.target.closest(".level-btn")
+      ) return;
+
+      if (e.touches.length === 1) {
+        isPanning = true;
+        isDragging = false;
+        startX = e.touches[0].clientX - pointX;
+        startY = e.touches[0].clientY - pointY;
+      }
+    }, { passive: false });
+
+    container.addEventListener("touchmove", (e) => {
+      if (!isPanning) return;
+      if (e.touches.length === 1) {
+        e.preventDefault(); // Prevents page from scrolling while moving the heart
+        isDragging = true;
+        pointX = e.touches[0].clientX - startX;
+        pointY = e.touches[0].clientY - startY;
+        setTransform();
+      }
+    }, { passive: false });
+
+    container.addEventListener("touchend", () => {
+      isPanning = false;
+      setTimeout(() => {
+        isDragging = false;
+      }, 50);
+    });
+
+    // ==========================================
+    //          INTERACTION HANDLERS
+    // ==========================================
     Object.keys(levelButtons).forEach(level => {
       if (!levelButtons[level]) return;
       levelButtons[level].addEventListener('click', () => {
@@ -289,7 +343,7 @@ fetch("./heart.svg")
       });
     });
 
-    // --- Section Click & State Save (Combined) ---
+    // --- Save State to LocalStorage ---
     function saveAllState() {
       const state = {};
       groups.forEach(group => {
@@ -301,6 +355,7 @@ fetch("./heart.svg")
       localStorage.setItem('quranHeartState', JSON.stringify(state));
     }
 
+    // --- Section Click Handler ---
     groups.forEach((group) => {
       group.addEventListener("click", (e) => {
         if (isDragging) return;
@@ -324,15 +379,19 @@ fetch("./heart.svg")
       });
     });
 
-    // --- Final Initialization & Download Setup ---
+    // ==========================================
+    //        DOWNLOAD & EXPORT LOGIC
+    // ==========================================
     const downloadDesktop = document.getElementById("download-desktop");
     const downloadMobile = document.getElementById("download-mobile");
     const downloadCustom = document.getElementById("download-custom");
     const modal = document.getElementById("custom-modal");
     const modalCancel = document.getElementById("modal-cancel");
     const modalDownload = document.getElementById("modal-download");
+    const customWidth = document.getElementById("custom-width");
+    const customHeight = document.getElementById("custom-height");
 
-    // Load state on startup
+    // --- Load Saved State on Startup ---
     const savedState = JSON.parse(localStorage.getItem('quranHeartState') || "{}");
     groups.forEach(g => {
       const path = g.querySelector('.section');
@@ -346,6 +405,11 @@ fetch("./heart.svg")
     customWidth.value = window.screen.width;
     customHeight.value = window.screen.height;
 
+    /**
+     * Generates a PNG from the SVG and triggers a download.
+     * @param {number} width - Target width in pixels
+     * @param {number} height - Target height in pixels
+     */
     function downloadSVG(width, height) {
       const svgElement = container.querySelector("svg");
       if (!svgElement) return;
@@ -359,6 +423,7 @@ fetch("./heart.svg")
       const targetAspectRatio = width / height;
       let scaledWidth, scaledHeight;
 
+      // Calculate scaling to fit the SVG within the target dimensions (contain)
       if (svgAspectRatio > targetAspectRatio) {
         scaledWidth = width * 0.8;
         scaledHeight = scaledWidth / svgAspectRatio;
@@ -384,6 +449,7 @@ fetch("./heart.svg")
       const textColor = styles.getPropertyValue("--text-color").trim();
       const textActiveColor = styles.getPropertyValue("--text-active-color").trim();
 
+      // Inject styles directly into SVG for Canvas rendering
       const styleElement = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "style"
@@ -423,7 +489,7 @@ fetch("./heart.svg")
 
       clonedSVG.insertBefore(styleElement, clonedSVG.firstChild);
 
-
+      // Create Canvas and Draw
       const canvas = document.createElement("canvas");
       canvas.width = width;
       canvas.height = height;
@@ -443,6 +509,7 @@ fetch("./heart.svg")
       const img = new Image();
 
       img.onload = function () {
+        // Draw image centered
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = "high";
         ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
