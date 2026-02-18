@@ -1,4 +1,4 @@
-const SURAH_AYAT_COUNT = {
+const SURAH_AYAT_COUNT_AR = {
   "الفاتحة": 7,
   "البقرة": 286,
   "آل عمران": 200,
@@ -115,10 +115,139 @@ const SURAH_AYAT_COUNT = {
   "الناس": 6
 };
 
+const SURAH_PAGE_COUNT_EN = {
+  "Al-Fatiha": 1,
+  "Al-Baqarah": 48,
+  "Ale-Imran": 26.93,
+  "An-Nisa": 29.4,
+  "Al-Ma'ida": 21.67,
+  "Al-An'am": 23.0,
+  "Al-A'raf": 26.0,
+  "Al-Anfal": 10.0,
+  "Al-Taubah": 20.93,
+  "Yunus": 13.47,
+  "Hud": 14.13,
+  "Yusuf": 13.47,
+  "Ar-Ra'd": 6.13,
+  "Ibrahim": 6.87,
+  "Al-Hijr": 5.4,
+  "An-Nahl": 14.6,
+  "Al-Isra": 11.6,
+  "Al-Kahf": 11.4,
+  "Maryam": 7.27,
+  "Ta-Ha": 9.73,
+  "Al-Anbiya": 9.93,
+  "Al-Hajj": 10.0,
+  "Al-Mu'minun": 8.0,
+  "An-Noor": 9.73,
+  "Al-Furqan": 7.27,
+  "Ash-Shuara": 10.0,
+  "An-Naml": 8.53,
+  "Al-Qasas": 11.0,
+  "Al-Ankaboot": 8.13,
+  "Ar-Room": 6.4,
+  "Luqman": 3.93,
+  "As-Sajda": 3.0,
+  "Al-Ahzab": 10.07,
+  "Saba": 6.47,
+  "Fatir": 5.73,
+  "Ya-Seen": 5.73,
+  "As-Saffat": 7.0,
+  "Saad": 5.27,
+  "Az-Zumar": 8.93,
+  "Ghafir": 9.87,
+  "Fussilat": 6.0,
+  "Ash-Shura": 6.27,
+  "Az-Zukhruf": 6.73,
+  "Ad-Dukhan": 2.93,
+  "Al-Jathiya": 3.47,
+  "Al-Ahqaf": 4.53,
+  "Muhammad": 4.07,
+  "Al-Fath": 4.4,
+  "Al-Hujraat": 2.6,
+  "Qaf": 2.73,
+  "Adh-Dhariyat": 2.73,
+  "At-Tur": 2.47,
+  "An-Najm": 2.67,
+  "Al-Qamar": 2.67,
+  "Ar-Rahman": 3.13,
+  "Al-Waqia": 3.27,
+  "Al-Hadid": 4.33,
+  "Al-Mujadila": 3.4,
+  "Al-Hashr": 3.53,
+  "Al-Mumtahana": 2.47,
+  "As-Saff": 1.6,
+  "Al-Jumua": 1.4,
+  "Al-Munafiqoon": 1.53,
+  "At-Taghabun": 2.0,
+  "At-Talaq": 2.07,
+  "At-Tahrim": 2.0,
+  "Al-Mulk": 2.33,
+  "Al-Qalam": 2.27,
+  "Al-Haaqqa": 1.93,
+  "Al-Maarij": 1.73,
+  "Nooh": 1.73,
+  "Al-Jinn": 2.0,
+  "Al-Muzzammil": 1.47,
+  "Al-Muddaththir": 1.87,
+  "Al-Qiyama": 1.27,
+  "Al-Insan": 1.8,
+  "Al-Mursalat": 1.6,
+  "An-Naba": 1.47,
+  "An-Naziat": 1.47,
+  "Abasa": 1.13,
+  "At-Takwir": 0.93,
+  "Al-Infitar": 0.73,
+  "Al-Mutaffifin": 1.4,
+  "Al-Inshiqaq": 0.93,
+  "Al-Burooj": 0.93,
+  "At-Tariq": 0.6,
+  "Al-Ala": 0.67,
+  "Al-Ghashiya": 0.87,
+  "Al-Fajr": 1.2,
+  "Al-Balad": 0.73,
+  "Ash-Shams": 0.6,
+  "Al-Lail": 0.67,
+  "Ad-Dhuha": 0.47,
+  "Ash-Sharh": 0.33,
+  "At-Tin": 0.4,
+  "Al-Alaq": 0.67,
+  "Al-Qadr": 0.33,
+  "Al-Bayyina": 0.8,
+  "Al-Zalzala": 0.4,
+  "Al-Adiyaat": 0.47,
+  "Al-Qaria": 0.47,
+  "At-Takaathur": 0.33,
+  "Al-Asr": 0.27,
+  "Al-Humaza": 0.4,
+  "Al-Feel": 0.33,
+  "Quraish": 0.33,
+  "Al-Maun": 0.4,
+  "Al-Kawthar": 0.27,
+  "Al-Kafiroon": 0.33,
+  "An-Nasr": 0.33,
+  "Al-Masad": 0.33,
+  "Al-Ikhlaas": 0.27,
+  "Al-Falaq": 0.33,
+  "An-Naas": 0.4
+}
+
+const SURAH_PAGE_COUNT_AR = Object.fromEntries(
+  Object.keys(SURAH_AYAT_COUNT_AR).map((key, index) => [key, Object.values(SURAH_PAGE_COUNT_EN)[index]])
+);
+
+const SURAH_AYAT_COUNT_EN = Object.fromEntries(
+  Object.keys(SURAH_PAGE_COUNT_EN).map((key, index) => [key, Object.values(SURAH_AYAT_COUNT_AR)[index]])
+);
+
+
 // Calculate total ayats dynamically
 // Object.values() extracts the counts into an array: [7, 286, 200, ...]
 // .reduce() sums them up starting from 0
-const TOTAL_AYATS = Object.values(SURAH_AYAT_COUNT).reduce((total, count) => total + count, 0);
+const TOTAL_AYATS = Object.values(SURAH_AYAT_COUNT_AR).reduce((total, count) => total + count, 0);
+
+// Calculate total pages dynamically
+const TOTAL_PAGES = Math.round(Object.values(SURAH_PAGE_COUNT_EN).reduce((total, count) => total + count, 0), 0); // 604 pages
 
 fetch("./heart.svg")
   .then((res) => {
@@ -205,6 +334,7 @@ fetch("./heart.svg")
       const total = groups.length;
       let completedSurahs = 0;
       let completedAyat = 0;
+      let completedPage = 0;
 
       groups.forEach((g) => {
         const path = g.querySelector(".section");
@@ -220,18 +350,32 @@ fetch("./heart.svg")
         if (isDone) {
           completedSurahs++;
           let surahName = textElement.textContent.replace("سورة", "").trim();
-          if (SURAH_AYAT_COUNT[surahName]) {
-            completedAyat += SURAH_AYAT_COUNT[surahName];
+          // Arabic Ayat Count 
+          if (SURAH_AYAT_COUNT_AR[surahName]) {
+            completedAyat += SURAH_AYAT_COUNT_AR[surahName];
+          }
+          // Arabic Page Count
+          if (SURAH_PAGE_COUNT_AR[surahName]) {
+            completedPage += SURAH_PAGE_COUNT_AR[surahName];
           }
         }
       });
 
+      // const remaining = total - completedSurahs;
+      // const ayatProgress = Math.round((completedAyat / TOTAL_AYATS) * 100);
+
+      // document.getElementById("stat-completed").textContent = `${completedSurahs} سورة`;
+      // document.getElementById("stat-remaining").textContent = `${remaining} سورة`;
+      // document.getElementById("stat-progress-bar").style.width = `${ayatProgress}%`;
+      // document.getElementById("stat-percentage").textContent =
+      //   `تم حفظ ${ayatProgress}% من القرآن الكريم والمتبقي ${100 - ayatProgress}%`;
+
       const remaining = total - completedSurahs;
-      const ayatProgress = Math.round((completedAyat / TOTAL_AYATS) * 100);
+      const pageProgress = Math.round((completedPage / TOTAL_PAGES) * 100);
 
       document.getElementById("stat-completed").textContent = `${completedSurahs} سورة`;
       document.getElementById("stat-remaining").textContent = `${remaining} سورة`;
-      document.getElementById("stat-progress-bar").style.width = `${ayatProgress}%`;
+      document.getElementById("stat-progress-bar").style.width = `${pageProgress}%`;
       document.getElementById("stat-percentage").textContent =
         `تم حفظ ${ayatProgress}% من القرآن الكريم والمتبقي ${100 - ayatProgress}%`;
     }
@@ -285,7 +429,7 @@ fetch("./heart.svg")
       const delta = -e.deltaY * zoomSensitivity;
       const newScale = Math.min(Math.max(0.5, scale + delta), 4);
 
-      // Optional: Zoom towards mouse position
+      // Zoom towards mouse position
       scale = newScale;
       setTransform();
     }, { passive: false });
