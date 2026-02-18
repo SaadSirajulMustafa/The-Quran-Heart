@@ -2,7 +2,7 @@
   --bg-color: #222831;
   --surah-color: #ffffff;
   --text-color: #000000;
-  --surah-active-color: #e63946;
+  --surah-active-color: #0918e1;
   --text-active-color: #ffffff;
   --stats-number-color: #e63946;
 }
@@ -209,7 +209,7 @@ svg {
   transition: fill 0.25s ease;
 }
 
-.section.active + .section-text {
+.section.active+.section-text {
   fill: var(--text-active-color);
 }
 
@@ -224,7 +224,8 @@ svg {
   z-index: 100;
 }
 
-.download-btn, .theme-btn {
+.download-btn,
+.theme-btn {
   width: 50px;
   height: 50px;
   border-radius: 25px;
@@ -239,14 +240,16 @@ svg {
   backdrop-filter: blur(10px);
 }
 
-.download-btn:hover, .theme-btn:hover  {
+.download-btn:hover,
+.theme-btn:hover {
   background-color: rgba(34, 40, 49, 0.95);
   border-color: rgba(255, 255, 255, 0.3);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
   transform: translateY(-2px);
 }
 
-.download-btn:active, .theme-btn:active {
+.download-btn:active,
+.theme-btn:active {
   transform: translateY(0);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
@@ -526,10 +529,13 @@ svg {
 }
 
 /* Text color adjustments for colored sections */
-.section.level-good + .section-text,
-.section.level-middle + .section-text,
-.section.level-weak + .section-text {
+.section.level-good+.section-text,
+.section.level-middle+.section-text,
+.section.level-weak+.section-text {
   fill: #ffffff;
+}
+.section.level-middle+.section-text{
+  fill: #000000;
 }
 
 /* Responsive adjustments for level buttons */
@@ -550,4 +556,3 @@ svg {
     height: 20px;
   }
 }
-
