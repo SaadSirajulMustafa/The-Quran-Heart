@@ -232,22 +232,26 @@ const SURAH_PAGE_COUNT_EN = {
   "An-Naas": 0.4
 }
 
+//Extracting values once to save memory/processing
+const pageValues = Object.values(SURAH_PAGE_COUNT_EN);
+const ayahValues = Object.values(SURAH_AYAT_COUNT_AR);
+
 const SURAH_PAGE_COUNT_AR = Object.fromEntries(
-  Object.keys(SURAH_AYAT_COUNT_AR).map((key, index) => [key, Object.values(SURAH_PAGE_COUNT_EN)[index]])
+  Object.keys(SURAH_AYAT_COUNT_AR).map((key, index) => [key, pageValues[index]])
 );
 
 const SURAH_AYAT_COUNT_EN = Object.fromEntries(
-  Object.keys(SURAH_PAGE_COUNT_EN).map((key, index) => [key, Object.values(SURAH_AYAT_COUNT_AR)[index]])
+  Object.keys(SURAH_PAGE_COUNT_EN).map((key, index) => [key, ayahValues[index]])
 );
 
 
 // Calculate total ayats dynamically
 // Object.values() extracts the counts into an array: [7, 286, 200, ...]
 // .reduce() sums them up starting from 0
-const TOTAL_AYATS = Object.values(SURAH_AYAT_COUNT_AR).reduce((total, count) => total + count, 0);
+const TOTAL_AYATS = ayahValues.reduce((total, count) => total + count, 0);
 
 // Calculate total pages dynamically
-const TOTAL_PAGES = Math.round(Object.values(SURAH_PAGE_COUNT_EN).reduce((total, count) => total + count, 0), 0); // 604 pages
+const TOTAL_PAGES = Math.round(pageValues.reduce((total, count) => total + count, 0), 0); // 604 pages
 
 fetch("./heart.svg")
   .then((res) => {
