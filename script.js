@@ -377,7 +377,24 @@ fetch("./heart.svg")
       document.getElementById("stat-remaining").textContent = `${remaining} سورة`;
       document.getElementById("stat-progress-bar").style.width = `${pageProgress}%`;
       document.getElementById("stat-percentage").textContent =
-        `تم حفظ ${ayatProgress}% من القرآن الكريم والمتبقي ${100 - ayatProgress}%`;
+        `تم حفظ ${pageProgress}% من القرآن الكريم والمتبقي ${100 - pageProgress}%`;
+    }
+
+    const resetBtn = document.getElementById('reset-progress');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        const confirmation = confirm('هل أنت متأكد من رغبتك في إعادة ضبط تقدم حفظك بالكامل؟ لا يمكن التراجع عن هذا الإجراء.');
+        if (confirmation) {
+          groups.forEach(g => {
+            const path = g.querySelector('.section');
+            if (path) {
+              path.classList.remove('active', 'level-good', 'level-middle', 'level-weak');
+            }
+          });
+          saveAllState();
+          updateStats();
+        }
+      });
     }
 
     // ==========================================
