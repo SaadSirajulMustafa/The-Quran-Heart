@@ -412,9 +412,11 @@ fetch("./heart.svg")
           message: 'هل أنت متأكد من رغبتك في إعادة ضبط تقدم حفظك بالكامل؟ لا يمكن التراجع عن هذا الإجراء.',
           onConfirm: () => {
             groups.forEach(g => {
-              const path = g.querySelector('.section');
-              if (path) {
-                path.classList.remove('active', 'level-good', 'level-middle', 'level-weak');
+              const paths = g.querySelectorAll('.section');
+              if (paths) {
+                paths.forEach(path => {
+                  path.classList.remove('active', 'level-good', 'level-middle', 'level-weak');
+                });
               }
             });
             saveAllState();
