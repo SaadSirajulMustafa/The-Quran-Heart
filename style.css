@@ -142,9 +142,35 @@ body {
   margin-bottom: 12px;
 }
 
+/* page/ayat Mode Toggle */
+.mode-toggle-btn {
+  width: 100%;
+  background: hsla(48, 88%, 22%, 0.6);
+  border: 1px solid hsla(48, 88%, 52%, 0.6);
+  border-radius: 6px;
+  padding: 6px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  color: #cccccc;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.mode-toggle-btn:hover {
+  background: hsla(48, 88%, 32%, 0.6);
+  border: 1px solid hsla(38, 88%, 72%, 0.6);
+  color: #ffffff;
+}
+
 .reset-btn {
   width: 100%;
-  padding: 8px;
+  padding: 6px;
   background-color: rgba(230, 57, 70, 0.15);
   border: 1px solid rgba(230, 57, 70, 0.3);
   border-radius: 6px;
@@ -534,7 +560,8 @@ svg {
 .section.level-weak+.section-text {
   fill: #ffffff;
 }
-.section.level-middle+.section-text{
+
+.section.level-middle+.section-text {
   fill: #000000;
 }
 

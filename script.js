@@ -331,6 +331,35 @@ fetch("./heart.svg")
     });
 
     // ==========================================
+    //           STATS MODE TOGGLE
+    // ==========================================
+    const modeToggleBtn = document.getElementById('stats-mode-toggle');
+    const modeLabel = document.getElementById('mode-label');
+    const modeIcon = document.getElementById('mode-icon');
+
+    // Default to 'page' if not set
+    let statsMode = localStorage.getItem('statsMode') || 'page';
+
+    function updateModeDisplay() {
+      if (statsMode === 'page') {
+        modeLabel.textContent = 'حساب بالصفحات';
+        modeIcon.textContent = '📄';
+      } else {
+        modeLabel.textContent = 'حساب بالآيات';
+        modeIcon.textContent = '🔢';
+      }
+      updateStats();
+    }
+
+    if (modeToggleBtn) {
+      modeToggleBtn.addEventListener('click', () => {
+        statsMode = statsMode === 'page' ? 'ayat' : 'page';
+        localStorage.setItem('statsMode', statsMode);
+        updateModeDisplay();
+      });
+    }
+
+    // ==========================================
     //            STATISTICS LOGIC
     // ==========================================
     function updateStats() {
@@ -364,23 +393,15 @@ fetch("./heart.svg")
         }
       });
 
-      // const remaining = total - completedSurahs;
-      // const ayatProgress = Math.round((completedAyat / TOTAL_AYATS) * 100);
-
-      // document.getElementById("stat-completed").textContent = `${completedSurahs} سورة`;
-      // document.getElementById("stat-remaining").textContent = `${remaining} سورة`;
-      // document.getElementById("stat-progress-bar").style.width = `${ayatProgress}%`;
-      // document.getElementById("stat-percentage").textContent =
-      //   `تم حفظ ${ayatProgress}% من القرآن الكريم والمتبقي ${100 - ayatProgress}%`;
-
       const remaining = total - completedSurahs;
-      const pageProgress = Math.round((completedPage / TOTAL_PAGES) * 100);
-
+      const percentage = (statsMode === 'page')
+        ? Math.round((completedPage / TOTAL_PAGES) * 100)
+        : Math.round((completedAyat / TOTAL_AYATS) * 100);
       document.getElementById("stat-completed").textContent = `${completedSurahs} سورة`;
       document.getElementById("stat-remaining").textContent = `${remaining} سورة`;
-      document.getElementById("stat-progress-bar").style.width = `${pageProgress}%`;
+      document.getElementById("stat-progress-bar").style.width = `${percentage}%`;
       document.getElementById("stat-percentage").textContent =
-        `تم حفظ ${pageProgress}% من القرآن الكريم والمتبقي ${100 - pageProgress}%`;
+        `تم حفظ ${percentage}% من القرآن الكريم والمتبقي ${100 - percentage}%`;
     }
 
     const resetBtn = document.getElementById('reset-progress');
@@ -397,7 +418,7 @@ fetch("./heart.svg")
               }
             });
             saveAllState();
-            updateStats();
+            updateModeDisplay();
           },
           icon: '⚠️',
           buttons: ['إلغاء', 'تأكيد'],
@@ -544,7 +565,7 @@ fetch("./heart.svg")
             p.classList.toggle("active", !isActive);
           });
         }
-        updateStats();
+        updateModeDisplay();
         saveAllState();
       });
     });
@@ -570,7 +591,7 @@ fetch("./heart.svg")
       }
     });
 
-    updateStats();
+    updateModeDisplay();
 
     customWidth.value = window.screen.width;
     customHeight.value = window.screen.height;
