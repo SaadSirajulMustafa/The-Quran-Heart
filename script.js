@@ -246,7 +246,6 @@ const SURAH_AYAT_COUNT_EN = Object.fromEntries(
 
 
 // Calculate total ayats dynamically
-// Object.values() extracts the counts into an array: [7, 286, 200, ...]
 // .reduce() sums them up starting from 0
 const TOTAL_AYATS = ayahValues.reduce((total, count) => total + count, 0);
 
