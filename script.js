@@ -386,17 +386,23 @@ fetch("./heart.svg")
     const resetBtn = document.getElementById('reset-progress');
     if (resetBtn) {
       resetBtn.addEventListener('click', () => {
-        const confirmation = confirm('هل أنت متأكد من رغبتك في إعادة ضبط تقدم حفظك بالكامل؟ لا يمكن التراجع عن هذا الإجراء.');
-        if (confirmation) {
-          groups.forEach(g => {
-            const path = g.querySelector('.section');
-            if (path) {
-              path.classList.remove('active', 'level-good', 'level-middle', 'level-weak');
-            }
-          });
-          saveAllState();
-          updateStats();
-        }
+        showModal('custom', {
+          title: 'إعادة ضبط',
+          message: 'هل أنت متأكد من رغبتك في إعادة ضبط تقدم حفظك بالكامل؟ لا يمكن التراجع عن هذا الإجراء.',
+          onConfirm: () => {
+            groups.forEach(g => {
+              const path = g.querySelector('.section');
+              if (path) {
+                path.classList.remove('active', 'level-good', 'level-middle', 'level-weak');
+              }
+            });
+            saveAllState();
+            updateStats();
+          },
+          icon: '⚠️',
+          buttons: ['إلغاء', 'تأكيد'],
+          color: 'rgb(244, 67, 54)'
+        });
       });
     }
 
@@ -720,7 +726,10 @@ fetch("./heart.svg")
         downloadSVG(width, height);
         modal.classList.remove("active");
       } else {
-        alert("Please enter valid dimensions between 100 and 10000 pixels.");
+        showModal('warning', {
+          title: 'Invalid Input',
+          message: 'Please enter valid dimensions between 100 and 10000 pixels.'
+        });
       }
     });
 
@@ -733,3 +742,143 @@ fetch("./heart.svg")
   .catch((error) => {
     console.error("Error initializing Quran Heart:", error);
   });
+
+// ==========================================
+//          Confirmation Modal
+// ==========================================
+/**
+* Main modal function - 3 types: confirm, warning, custom
+* @param {string} type - 'confirm', 'warning', or 'custom'
+* @param {object} options - Configuration
+*/
+function showModal(type, options = {}) {
+  return new Promise((resolve) => {
+    // Destructure options with default values
+    const {
+      title = 'Notification',
+      message = '',
+      icon = null,
+      color = null,
+      timeout = null,
+      onConfirm = null,
+      onCancel = null,
+      buttons,
+      direction
+    } = options;
+
+    // Configure modal appearance based on type
+    let config;
+    switch (type) {
+      case 'confirm':
+        config = { icon: '❓', buttons: ['Cancel', 'Confirm'] };
+        break;
+      case 'warning':
+        config = { icon: '⚠️', buttons: ['OK'] };
+        break;
+      case 'custom':
+        config = {
+          icon: icon || 'ℹ️',
+          buttons: buttons || ['OK'],
+          customColor: color
+        };
+        break;
+      default:
+        config = { icon: 'ℹ️', buttons: ['OK'] };
+    }
+
+    // Instantiate modal from HTML template
+    const template = document.getElementById('modal-template');
+    const clone = template.content.cloneNode(true);
+    const overlay = clone.querySelector('.modal-overlay');
+    const container = clone.querySelector('.modal-container');
+    const iconEl = clone.querySelector('.modal-icon');
+    const titleEl = clone.querySelector('.modal-title');
+    const messageEl = clone.querySelector('.modal-message');
+    const buttonsEl = clone.querySelector('.modal-buttons');
+
+    // Apply styling classes
+    container.classList.add(type);
+
+    // Criteria: Auto-detect direction based on content if not specified
+    // If text contains Arabic characters, use RTL (default). If not, use LTR.
+    const hasArabic = /[\u0600-\u06FF]/.test(title + message);
+    const isLtr = direction === 'ltr' || (!direction && !hasArabic);
+
+    if (isLtr) {
+      container.classList.add('ltr');
+    }
+
+    // Apply custom border color if provided
+    if (type === 'custom' && config.customColor) {
+      container.style.borderTopColor = config.customColor;
+    }
+
+    // Set content
+    iconEl.textContent = config.icon;
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+
+    // Generate action buttons dynamically
+    config.buttons.forEach((btnText, index) => {
+      const btn = document.createElement('button');
+      btn.className = 'modal-btn';
+      btn.textContent = btnText;
+
+      // LOGIC: The last button in the array is always the "Primary" (Confirm) button
+      const isPrimary = index === config.buttons.length - 1;
+      btn.classList.add(isPrimary ? 'primary' : 'secondary');
+
+      btn.onclick = () => {
+        // The primary action is determined by position, not text, to support multiple languages.
+        if (isPrimary && onConfirm) onConfirm();
+        else if (!isPrimary && onCancel) onCancel();
+
+        // Resolve promise for 'confirm' type modals
+        if (type === 'confirm') resolve(isPrimary);
+
+        closeModal(overlay);
+      };
+
+      buttonsEl.appendChild(btn);
+    });
+
+    // Add to DOM
+    document.body.appendChild(overlay);
+
+    // Handle auto-close timer
+    if (timeout) {
+      setTimeout(() => {
+        if (document.body.contains(overlay)) {
+          closeModal(overlay);
+          if (type === 'confirm') resolve(false);
+        }
+      }, timeout);
+    }
+
+    // Close on overlay click
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        closeModal(overlay);
+        if (type === 'confirm') resolve(false);
+      }
+    });
+
+    // Handle Escape key press
+    const escHandler = (e) => {
+      if (e.key === 'Escape') {
+        closeModal(overlay);
+        if (type === 'confirm') resolve(false);
+        document.removeEventListener('keydown', escHandler);
+      }
+    };
+    document.addEventListener('keydown', escHandler);
+  });
+}
+
+function closeModal(overlay) {
+  // Animate out before removing from DOM
+  overlay.classList.add('closing');
+  setTimeout(() => overlay.remove(), 300);
+}
+//         End Modal
+// ==============================

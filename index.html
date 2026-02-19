@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <title>The-Quran-Heart</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="Confirmation-Modal-Style.css">
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -151,6 +152,20 @@
       </div>
     </div>
   </div>
+
+  <!-- Confirmation Modal Template -->
+  <template id="modal-template">
+    <div class="modal-overlay">
+      <div class="modal-container">
+        <div class="modal-header">
+          <span class="modal-icon"></span>
+          <h2 class="modal-title"></h2>
+        </div>
+        <div class="modal-message"></div>
+        <div class="modal-buttons"></div>
+      </div>
+    </div>
+  </template>
 
   <script src="script.js"></script>
 </body>
