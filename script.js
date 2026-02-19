@@ -360,6 +360,15 @@ fetch("./heart.svg")
     }
 
     // ==========================================
+    //        APPLICATION UPDATE ORCHESTRATOR
+    // ==========================================
+    function updateApp() {
+      // This single function calls the necessary updates for UI and state.
+      updateModeDisplay(); // Updates stats and mode display.
+      saveAllState();      // Saves the current progress to localStorage.
+    }
+
+    // ==========================================
     //            STATISTICS LOGIC
     // ==========================================
     function updateStats() {
@@ -419,8 +428,7 @@ fetch("./heart.svg")
                 });
               }
             });
-            saveAllState();
-            updateModeDisplay();
+            updateApp();
           },
           icon: '⚠️',
           buttons: ['إلغاء', 'تأكيد'],
@@ -567,8 +575,7 @@ fetch("./heart.svg")
             p.classList.toggle("active", !isActive);
           });
         }
-        updateModeDisplay();
-        saveAllState();
+        updateApp();
       });
     });
 
@@ -593,7 +600,7 @@ fetch("./heart.svg")
       }
     });
 
-    updateModeDisplay();
+    updateApp();
 
     customWidth.value = window.screen.width;
     customHeight.value = window.screen.height;
